@@ -1,0 +1,230 @@
+/*body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #74ebd5, #9face6); : #333;
+    
+}
+h1#BigTitle{
+     font-family: 'Roboto Mono', monospace;
+    background: linear-gradient(135deg, #232526, #414345); 
+    color: #f0f0f0; 
+    text-transform: uppercase; 
+    letter-spacing: 2px; 
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+#result, .logs {
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.logs{
+    height: 60px;
+    width: 120px;
+    justify-content: center;
+    text-align: center;
+}*/
+
+
+/* General styles */
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1d3557, #457b9d); /* Dynamic gradient */
+    height: 100vh;
+    background-attachment: fixed; /* Fix the background */
+    background-size: cover; /* Ensure the background covers the entire viewport */
+    background-repeat: no-repeat; /* Avoid tiling */
+}
+
+h1#BigTitle {
+    font-family: 'Roboto Mono', monospace; /* Technical and professional style */
+    background: linear-gradient(135deg, #2a9d8f, #e9c46a); /* Vibrant gradient */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent; /* Gradient text */
+    text-transform: uppercase; /* Bold, formal style */
+    letter-spacing: 3px; /* Letter spacing */
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+h1#tableTitle {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+h3 {
+    margin: 0 0 10px;
+    font-size: 18px;
+}
+
+/* Containers and content styles */
+#result, .logs {
+    display: inline;
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent container */
+    color: black;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Shadow effect for depth */
+    max-width: 700px;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    text-align: center;
+    size: 100%;
+}
+
+/* Buttons */
+.logs {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    width: 150px;
+    background: linear-gradient(135deg, #2a9d8f, #e9c46a); /* Dynamic colors */
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.logs:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Hover effect */
+}
+
+.logs:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Active effect */
+}
+
+button {
+    cursor: pointer;
+    margin: 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    background: #74ebd5;
+    color: #333;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background: #9face6;
+}
+
+/* Table container and layout */
+#table-container {
+    display: flex;
+    flex-wrap: wrap; /* Ensure responsiveness for smaller screens */
+    gap: 20px; /* Space between tables */
+    justify-content: center;
+    align-items: flex-start;
+    margin: 20px 0;
+}
+
+/* Table styles */
+.table-wrapper {
+    width: 90%; /* Adjust table wrapper width */
+    max-width: 800px; /* Limit max width */
+    margin: 0 auto;
+    background: white;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow effect */
+    overflow-x: auto; /* Handle overflow for small tables */
+}
+
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    text-align: left;
+}
+
+.styled-table th, 
+.styled-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+.styled-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+.styled-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.styled-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+
+#result {
+    position: relative; /* Ensures the button is positioned relative to this container */
+    top: 50%; /* Move to 50% from the top */
+    display: none;
+}
+
+#return-button{
+    position: absolute;
+    bottom: 10px; /* Distance from the bottom */
+    right: 10px; /* Distance from the right */
+    margin: 0; /* Remove additional margins for precise positioning */
+    font-size: 40px; /* Font size as per your preference */
+    padding: 10px 20px; /* Adjust padding for better look */
+}
+
+
+#cont {
+    width: 100%; /* Full width */
+    padding: 20px 0; /* Space around the container */
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+    align-items: center;
+    background: rgba(255, 255, 255, 0.9); /* Semi-transparent background */
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Soft shadow */
+    position: fixed; /* Fixed to the top of the page */
+    top: 0;
+    z-index: 1000; /* Ensure it stays above other elements */
+}
+
+/* Styling for #login and #work */
+#login, #work {
+    display: flex;
+    gap: 15px; /* Space between buttons */
+    margin-bottom: 15px; /* Space between #login and #work */
+}
+
+#work {
+    display: none; /* Completely hides the element */
+}
+
+/* Buttons inside #work, reuse the .logs class but add specific overrides */

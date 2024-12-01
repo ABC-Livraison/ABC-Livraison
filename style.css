@@ -1,45 +1,3 @@
-/*body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #74ebd5, #9face6); : #333;
-    
-}
-h1#BigTitle{
-     font-family: 'Roboto Mono', monospace;
-    background: linear-gradient(135deg, #232526, #414345); 
-    color: #f0f0f0; 
-    text-transform: uppercase; 
-    letter-spacing: 2px; 
-}
-
-h1 {
-    margin-bottom: 20px;
-}
-
-#result, .logs {
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    max-width: 600px;
-    word-wrap: break-word;
-    white-space: pre-wrap;
-}
-
-.logs{
-    height: 60px;
-    width: 120px;
-    justify-content: center;
-    text-align: center;
-}*/
-
-
-/* General styles */
 body {
     margin: 0;
     font-family: 'Roboto', sans-serif;
@@ -47,22 +5,21 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    
     min-height: 100vh;
-    background: linear-gradient(135deg, #1d3557, #457b9d); /* Dynamic gradient */
+    background: linear-gradient(135deg, #1d3557, #457b9d);
     height: 100vh;
-    background-attachment: fixed; /* Fix the background */
-    background-size: cover; /* Ensure the background covers the entire viewport */
-    background-repeat: no-repeat; /* Avoid tiling */
+    background-attachment: fixed;
+    background-size: cover;
+    background-repeat: no-repeat;
 }
 
 h1#BigTitle {
-    font-family: 'Roboto Mono', monospace; /* Technical and professional style */
-    background: linear-gradient(135deg, #2a9d8f, #e9c46a); /* Vibrant gradient */
+    font-family: 'Roboto Mono', monospace;
+    background: linear-gradient(135deg, #2a9d8f, #e9c46a);
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent; /* Gradient text */
-    text-transform: uppercase; /* Bold, formal style */
-    letter-spacing: 3px; /* Letter spacing */
+    -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
+    letter-spacing: 3px;
     font-size: 2.5rem;
     margin-bottom: 20px;
 }
@@ -77,14 +34,13 @@ h3 {
     font-size: 18px;
 }
 
-/* Containers and content styles */
 #result, .logs {
     display: inline;
-    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent container */
+    background-color: rgba(255, 255, 255, 0.9);
     color: black;
     padding: 20px;
     border-radius: 15px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Shadow effect for depth */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
     max-width: 700px;
     word-wrap: break-word;
     white-space: pre-wrap;
@@ -92,14 +48,13 @@ h3 {
     size: 100%;
 }
 
-/* Buttons */
 .logs {
     display: flex;
     align-items: center;
     justify-content: center;
     height: 50px;
     width: 150px;
-    background: linear-gradient(135deg, #2a9d8f, #e9c46a); /* Dynamic colors */
+    background: linear-gradient(135deg, #2a9d8f, #e9c46a);
     color: #ffffff;
     font-size: 1rem;
     font-weight: bold;
@@ -112,12 +67,12 @@ h3 {
 
 .logs:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Hover effect */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
 .logs:active {
     transform: translateY(0);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Active effect */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 button {
@@ -136,26 +91,24 @@ button:hover {
     background: #9face6;
 }
 
-/* Table container and layout */
 #table-container {
     display: flex;
-    flex-wrap: wrap; /* Ensure responsiveness for smaller screens */
-    gap: 20px; /* Space between tables */
+    flex-wrap: wrap;
+    gap: 20px;
     justify-content: center;
     align-items: flex-start;
     margin: 20px 0;
 }
 
-/* Table styles */
 .table-wrapper {
-    width: 90%; /* Adjust table wrapper width */
-    max-width: 800px; /* Limit max width */
+    width: 90%;
+    max-width: 800px;
     margin: 0 auto;
     background: white;
     border-radius: 8px;
     padding: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow effect */
-    overflow-x: auto; /* Handle overflow for small tables */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
 }
 
 .styled-table {
@@ -185,46 +138,41 @@ button:hover {
     background-color: #f1f1f1;
 }
 
-
 #result {
-    position: relative; /* Ensures the button is positioned relative to this container */
-    top: 50%; /* Move to 50% from the top */
+    position: relative;
+    top: 30%;
     display: none;
 }
 
-#return-button{
-    position: absolute;
-    bottom: 10px; /* Distance from the bottom */
-    right: 10px; /* Distance from the right */
-    margin: 0; /* Remove additional margins for precise positioning */
-    font-size: 40px; /* Font size as per your preference */
-    padding: 10px 20px; /* Adjust padding for better look */
+#return-button {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    margin: 0;
+    font-size: 40px;
+    padding: 10px 20px;
 }
-
 
 #cont {
-    width: 100%; /* Full width */
-    padding: 20px 0; /* Space around the container */
+    width: 100%;
+    padding: 20px 0;
     display: flex;
-    flex-direction: column; /* Stack children vertically */
+    flex-direction: column;
     align-items: center;
-    background: rgba(255, 255, 255, 0.9); /* Semi-transparent background */
+    background: rgba(255, 255, 255, 0.9);
     border-radius: 15px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Soft shadow */
-    position: fixed; /* Fixed to the top of the page */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    position: fixed;
     top: 0;
-    z-index: 1000; /* Ensure it stays above other elements */
+    z-index: 1000;
 }
 
-/* Styling for #login and #work */
 #login, #work {
     display: flex;
-    gap: 15px; /* Space between buttons */
-    margin-bottom: 15px; /* Space between #login and #work */
+    gap: 15px;
+    margin-bottom: 15px;
 }
 
 #work {
-    display: none; /* Completely hides the element */
+    display: none;
 }
-
-/* Buttons inside #work, reuse the .logs class but add specific overrides */

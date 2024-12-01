@@ -1,8 +1,8 @@
 
-const SITE = "http://localhost:8080/";
+const SITE = "https://free-sgbd2024.fly.dev"; // http://localhost:8080/
 
 const admin = document.getElementById('admin');
-const chaffeur = document.getElementById('chauffeur');
+const chauffeur = document.getElementById('chauffeur');
 const work = document.getElementById('work');
 const consult = document.getElementById('consult');
 const stat = document.getElementById('stat'); 
@@ -88,8 +88,22 @@ function deleteEvent(object,event){
     object.removeEventListener('click',event);
 }
 
+/*
+  ___      _           _     
+ / _ \    | |         (_)      
+/ /_\ \ __| |_ __ ___  _ _ __  
+|  _  |/ _` | '_ ` _ \| | '_ \ 
+| | | | (_| | | | | | | | | | |
+\_| |_/\__,_|_| |_| |_|_|_| |_|             
+                                                            
+*/
+
 function fetchDataAdmin(){
     consult.addEventListener('click',dataAdminConsult);   
+    stat.addEventListener('click',dataAdminStat);
+    maj.addEventListener('click',dataAdminMAJ);
+    chauffeur.style.display = 'none';
+    stat.style.display = 'flex';
 }
 
 
@@ -104,17 +118,240 @@ function dataAdminConsult(){
     //consult.removeEventListener('click',dataAdminConsult);
 }
 
-/*function dataAdminStat(){
-    fetchData(SITE+'').then(tab => result.appendChild(tab));
-    fetchData(SITE+'').then(tab => result.appendChild(tab));
-    fetchData(SITE+'').then(tab => result.appendChild(tab));
-    fetchData(SITE+'').then(tab => result.appendChild(tab));
-    fetchData(SITE+'').then(tab => result.appendChild(tab));
-}*/
-
-function fetchDataChauffeur(){
-    consult.addEventListener('click',dataChauffeurConsult);
+function dataAdminStat(){
+    fetchData(SITE+'statistic/avg_weight',"Moyenne des poids transportés par camion par livraison").then(tab => result.appendChild(tab));
+    fetchData(SITE+'statistic/avg_distance',"Distance parcourue par chauffeur").then(tab => result.appendChild(tab));
+    deleteEvent(stat,dataAdminStat);
 }
+
+function dataAdminMAJ(){
+    //fetchData(SITE+'select/chauffeurs/0',"Tableau de schauffeurs" ).then(tab =>  dataFormMaj(tab));
+    let adminId = 0;
+    const auth = Authentification();
+    const submitB = submitButton("Submit");
+
+    function deleteButtons(){
+        missionMajStat.remove();
+        livraisonMaj.remove();
+        camionMaj.remove();
+        chauffeurMaj.remove();
+        missionMaj.remove();
+    }
+
+    submitB.addEventListener('click',()=>{
+        const missionMajStat = submitButton("Etat de mission ");
+        const livraisonMaj = submitButton("Ajout de livraison");
+        const camionMaj = submitButton("Ajout de Camion");
+        const chauffeurMaj = submitButton("Ajout de Chauffeur");
+        const missionMaj = submitButton("Ajout de mission");
+
+        auth.style.display = 'none';
+        submitB.style.display = 'none';
+
+        function deleteButtons(){
+            missionMajStat.remove();
+            livraisonMaj.remove();
+            camionMaj.remove();
+            chauffeurMaj.remove();
+            missionMaj.remove();
+        }
+    
+
+
+        missionMajStat.addEventListener('click',()=>{
+            deleteButtons();
+            adminId = auth.value.trim();
+            if(adminId<=4 && adminId>=1){
+                console.log(adminId); 
+                auth.remove(); 
+                submitB.remove();
+                dataAdminMAJMission(`missons/admins/EnAttente/${adminId}`);//the function !!  missons/admins/EnAttente/${adminId}
+            }
+            else{
+                alert("Please enter a valid admin ID");
+            }
+        });
+
+
+        camionMaj.addEventListener('click',()=>{fetchData(SITE+'select/camions/0' ).then(tab =>  dataFormMaj(tab,SITE+'insert/camions'));deleteButtons()});
+        chauffeurMaj.addEventListener('click',()=>{fetchData(SITE+'select/chauffeurs/0' ).then(tab =>  dataFormMaj(tab,SITE+'insert/chauffeurs'));deleteButtons()});
+        missionMaj.addEventListener('click',()=>{fetchData(SITE+'select/missions/0').then(tab =>  dataFormMaj(tab,SITE+'insert/missions'));deleteButtons()});
+
+
+        livraisonMaj.addEventListener('click',()=>{
+            fetchData(SITE+'select/livraisons/0').then(tab =>  dataFormMaj(tab,SITE+'insert/livraisons'));
+            deleteButtons()
+            //const div = document.createElement('div');
+            const b = submitButton('+produit');
+            //div.appendChild(b);
+            result.appendChild(b)
+            b.addEventListener('click',()=>(fetchData(SITE+'select/produits/0').then(tab => dataFormMaj(tab,SITE+'insert/produits'))));
+        });
+
+
+
+
+
+    });
+    deleteEvent(maj,dataAdminMAJ);
+}
+
+async function dataAdminMAJMission(uri) {
+    try {
+        const tableWrapper = await fetchData(SITE + uri, "Mission en attente");//just testing with the select
+        if(!tableWrapper){
+            console.log('issue!!!!!!!!');
+        }
+        // Get the table element from the tableWrapper
+        const table = tableWrapper.querySelector('table');
+
+        if (table) {
+            // Add a "status" dropdown and submit button in each row
+            const statusOptions = ['EnCours', 'Abandonne', 'EnAttente'];
+            const rows = Array.from(table.querySelectorAll('tbody tr'));
+
+            rows.forEach((row, index) => {
+                // Add dropdown for status
+                const statusCell = document.createElement('td');
+                const select = document.createElement('select');
+
+                statusOptions.forEach((status) => {
+                    const option = document.createElement('option');
+                    option.value = status;
+                    option.textContent = status;
+                    select.appendChild(option);
+                });
+
+                statusCell.appendChild(select);
+                row.appendChild(statusCell); // Add dropdown to the row
+
+                // Add submit button
+                const buttonCell = document.createElement('td');
+                const submitButton = document.createElement('button');
+                submitButton.textContent = 'Submit';
+                submitButton.style.margin = '0 5px'; // Add some spacing
+
+                // Add event listener for the button
+                submitButton.addEventListener('click', () => sendDataLine(row, index));
+
+                buttonCell.appendChild(submitButton);
+                row.appendChild(buttonCell); // Add button to the row
+            });
+        }
+
+        // Append the updated tableWrapper to the result
+        result.appendChild(tableWrapper);
+    } catch (error) {
+        console.error('Error in dataAdminMAJMission:', error);
+    }
+}
+
+
+function sendDataLine(row, index) {
+    const data = {}; // Create a map to store data >>> need to be changed after discussing the way of storage once again with anas hhhhhhhhhh
+
+    const table = row.closest('table');
+    const headers = Array.from(table.querySelectorAll('thead th')).map(header => header.textContent.trim());
+
+    const cells = row.querySelectorAll('td');
+    cells.forEach((cell, cellIndex) => {
+        let value;
+        const select = cell.querySelector('select');
+        if(select){
+            value = select.value;
+        } 
+        else{
+            value = cell.textContent.trim();         
+        }
+
+        data[headers[cellIndex]]= value;
+    });
+
+    console.log(`Row ${index + 1} data:`, data); // Convert the map to an object for readability the chef's kiss ofc (ihda2 lilghali)
+    return data;
+}
+function dataFormMaj(table,toSendUri) {
+    result.innerHTML = ''; // Clear previous form elements
+    let HeadRowElem = table.querySelector('thead tr').getElementsByTagName('th');
+    let titles = Array.from(HeadRowElem).map(th => th.innerText);
+    let dataHolder = [];
+
+    const formContainer = document.createElement('fieldset');
+    formContainer.style.border = "1px solid #ddd";
+    formContainer.style.padding = "20px";
+    formContainer.style.margin = "20px";
+    result.style.display = "block";
+
+    titles.forEach((title, index) => {
+        const div = document.createElement('div');
+        div.style.display = "flex";
+        div.style.alignItems = "center";
+        div.style.marginBottom = "10px";
+
+        const label = document.createElement('label');
+        label.innerHTML = title + ' : ';
+        label.style.marginRight = "10px";
+        label.style.width = "150px";
+        label.style.textAlign = "right";
+        label.htmlFor = `input-${index}`;
+
+        const input = document.createElement('input');
+        input.type = "text";
+        input.id = `input-${index}`;
+        input.style.flex = "1";
+        input.style.padding = "5px";
+        dataHolder.push(input);
+
+        div.appendChild(label);
+        div.appendChild(input);
+        formContainer.appendChild(div);
+    });
+
+    result.appendChild(formContainer);
+
+    const sendButton = submitButton('send data');
+    sendButton.addEventListener('click', () => parseDateFromFormMaj(titles, dataHolder, toSendUri));
+    result.appendChild(sendButton);
+}
+
+function parseDateFromFormMaj(titles, dataHolder, uri) {
+    let res = {};
+    titles.forEach((title, index) => {
+        let value = dataHolder[index].value.trim();
+        if (!value) {
+            console.warn(`${title} is empty!`);
+        }
+        res[title] = value;
+    });
+    console.log(res);
+    sendData(uri, res);
+}
+
+function sendData(uri, data = {}) {
+    fetch(uri, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    })
+    .then(response => {
+        if (response.ok) {
+            console.log('Data sent successfully:', data);
+        } else {
+            console.error('Error sending data:', response.status);
+        }
+    })
+    .catch(error => {
+        console.error('Network error:', error);
+    });
+}
+
+
+
+
+
+
 
 function Authentification(){
     const input = document.createElement('input'); // Create an input element
@@ -125,17 +362,38 @@ function Authentification(){
     return input; // Return the input for further use
 }
 
-function submitButton(){
+function submitButton(text){
     const submitB = document.createElement('button');
-    submitB.innerText = "Submit";
+    submitB.innerText = text;
     submitB.style.marginLeft = "10px";
     result.appendChild(submitB);
     return submitB;
 }
 
+
+
+/*
+ _____ _                  __  __                
+/  __ \ |                / _|/ _|               
+| /  \/ |__   __ _ _   _| |_| |_ ___ _   _ _ __ 
+| |   | '_ \ / _` | | | |  _|  _/ _ \ | | | '__|
+| \__/\ | | | (_| | |_| | | | ||  __/ |_| | |   
+ \____/_| |_|\__,_|\__,_|_| |_| \___|\__,_|_|   
+                                                
+  */                                              
+
+ 
+function fetchDataChauffeur(){
+    consult.addEventListener('click',dataChauffeurConsult);
+    maj.addEventListener('click',dataChauffeurMAJ);
+    stat.style.display = 'none';
+    admin.style.display = 'none';
+}
+
+
 function dataChauffeurConsult(){
     const input = Authentification(); // Create the input field
-    const submitB = submitButton();
+    const submitB = submitButton("Submit");
     submitB.addEventListener('click', () => {
         const id = input.value.trim() ; // Get the input value, 
         if (id) {
@@ -151,6 +409,15 @@ function dataChauffeurConsult(){
     //result.style.display = 'flex';
     //consult.removeEventListener('click',dataChauffeurConsult);
 }
+
+
+
+
+function dataChauffeurMAJ(){
+
+}
+
+
 
 // Call the function, this is just a first try
 //fetchData();
@@ -210,6 +477,8 @@ chauffeur.addEventListener("click",()=>{work.style.display = 'flex';
 
 returnButton.addEventListener("click",()=>{redirectToLogin();
                                             work.style.display = 'none';
+                                            admin.style.display = 'flex';
+                                            chauffeur.style.display = 'flex';
                                             });
                                     
 

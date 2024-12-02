@@ -1,5 +1,5 @@
 
-const SITE = "https://free-sgbd2024.fly.dev/";
+const SITE = "http://localhost:8080/";
 
 const admin = document.getElementById('admin');
 const chauffeur = document.getElementById('chauffeur');
@@ -79,7 +79,7 @@ async function fetchData(uri, title = "Table") {
         
     } catch (error) {
         console.error('Error fetching data:', error);
-        //document.getElementById('result').textContent = 'Error fetching data, activate the server!!';
+        document.getElementById('result').textContent = 'no data available for your request';
     }
 }
 
@@ -121,6 +121,7 @@ function dataAdminConsult(){
 function dataAdminStat(){
     fetchData(SITE+'statistic/avg_weight',"Moyenne des poids transportés par camion par livraison").then(tab => result.appendChild(tab));
     fetchData(SITE+'statistic/avg_distance',"Distance parcourue par chauffeur").then(tab => result.appendChild(tab));
+    fetchData(SITE+'statistic/classement_chauffeur', "classement des chauffeurs").then(tab => result.appendChild(tab));
     deleteEvent(stat,dataAdminStat);
 }
 
@@ -129,14 +130,6 @@ function dataAdminMAJ(){
     let adminId = 0;
     const auth = Authentification();
     const submitB = submitButton("Submit");
-
-    function deleteButtons(){
-        missionMajStat.remove();
-        livraisonMaj.remove();
-        camionMaj.remove();
-        chauffeurMaj.remove();
-        missionMaj.remove();
-    }
 
     submitB.addEventListener('click',()=>{
         const missionMajStat = submitButton("Etat de mission ");
@@ -165,7 +158,7 @@ function dataAdminMAJ(){
                 console.log(adminId); 
                 auth.remove(); 
                 submitB.remove();
-                dataAdminMAJMission(`missons/admins/EnAttente/${adminId}`);//the function !!  missons/admins/EnAttente/${adminId}
+                dataAdminMAJMission2(`missions/admins/EnAttente/${adminId}`);//,SITE+'update/missions/id=:id');//the function !!  missons/admins/EnAttente/${adminId}
             }
             else{
                 alert("Please enter a valid admin ID");
@@ -175,43 +168,40 @@ function dataAdminMAJ(){
 
         camionMaj.addEventListener('click',()=>{fetchData(SITE+'select/camions/0' ).then(tab =>  dataFormMaj(tab,SITE+'admin/insert/camion'));deleteButtons()});
         chauffeurMaj.addEventListener('click',()=>{fetchData(SITE+'select/chauffeurs/0' ).then(tab =>  dataFormMaj(tab,SITE+'admin/insert/chauffeur'));deleteButtons()});
-        missionMaj.addEventListener('click',()=>{fetchData(SITE+'select/missions/0').then(tab =>  dataFormMaj(tab,SITE+'admin/insert/mission'));deleteButtons()});
-
-
-        livraisonMaj.addEventListener('click',()=>{
-            fetchData(SITE+'select/livraisons/0').then(tab =>  dataFormMaj(tab,SITE+'admin/insert/livraisons'));
-            deleteButtons()
-            //const div = document.createElement('div');
-            const b = submitButton('+produit');
-            //div.appendChild(b);
-            result.appendChild(b)
-            b.addEventListener('click',()=>(fetchData(SITE+'select/produits/0').then(tab => dataFormMaj(tab,SITE+'insert/produits'))));
-        });
-
-
-
+        livraisonMaj.addEventListener('click',()=>dataFormLivraisonMaj(SITE+'admin/insert/livraison'));
+        missionMaj.addEventListener('click',()=>dataFormMissionMaj(SITE+'admin/insert/mission'));
 
 
     });
     deleteEvent(maj,dataAdminMAJ);
 }
 
-async function dataAdminMAJMission(uri) {
+async function dataAdminMAJMission2(uri) {
     try {
-        const tableWrapper = await fetchData(SITE + uri, "Mission en attente");//just testing with the select
-        if(!tableWrapper){
-            console.log('issue!!!!!!!!');
-        }
-        // Get the table element from the tableWrapper
-        const table = tableWrapper.querySelector('table');
+        const tableWrapper = await fetchData(SITE + uri, "Mission en attente"); // Fetch the data
 
+        if (!tableWrapper) {
+            //console.error('Error fetching data!');
+            return;
+        }
+
+        const table = tableWrapper.querySelector('table');
         if (table) {
-            // Add a "status" dropdown and submit button in each row
             const statusOptions = ['EnCours', 'Abandonne', 'EnAttente'];
             const rows = Array.from(table.querySelectorAll('tbody tr'));
 
             rows.forEach((row, index) => {
-                // Add dropdown for status
+                // Extract IDs from the row (modify this based on your data structure)
+                const idMission = row.cells[0]?.innerText.trim(); // Assume ID is in the first cell
+                const idAdmin = row.cells[1]?.innerText.trim();    // Assume Admin ID is in the second cell
+                console.log("mission:",idMission);
+
+                if (!idMission || !idAdmin) {
+                    console.error(`Missing data for row: ${index}`);
+                    return;
+                }
+
+                // Add status dropdown
                 const statusCell = document.createElement('td');
                 const select = document.createElement('select');
 
@@ -225,14 +215,50 @@ async function dataAdminMAJMission(uri) {
                 statusCell.appendChild(select);
                 row.appendChild(statusCell); // Add dropdown to the row
 
+                // Add date input for "date_prevue"
+                const dateCell = document.createElement('td');
+                const dateInput = document.createElement('input');
+                dateInput.type = 'date';
+                dateInput.required = true;
+                dateCell.appendChild(dateInput);
+                row.appendChild(dateCell);
+
                 // Add submit button
                 const buttonCell = document.createElement('td');
                 const submitButton = document.createElement('button');
                 submitButton.textContent = 'Submit';
-                submitButton.style.margin = '0 5px'; // Add some spacing
+                submitButton.style.margin = '0 5px';
 
-                // Add event listener for the button
-                submitButton.addEventListener('click', () => sendDataLine(row, index));
+                // Add event listener to submit button
+                submitButton.addEventListener('click', async () => {
+                    const payload = {
+                        row: {
+                            //id_chauffeur: idChauffeur,
+                            //id_admin: idAdmin,
+                            status: select.value,
+                            //date_prevue: dateInput.value
+                        }
+                    };
+                    console.log(payload);
+
+                    try {
+                        // Send the data
+                        const sentUri = SITE+`update/missions/id=${idMission}`;
+                        console.log(sentUri);
+                        const response = sendData(sentUri, payload);
+
+                        if (response.ok) {
+                            console.log(`Row ${index + 1} data sent successfully:`, payload);
+                            alert(`Row ${index + 1} submission successful!`);
+                        } else {
+                            console.error(`Row ${index + 1} submission failed. Status: ${response.status}`);
+                            alert(`Error submitting row ${index + 1}. Status: ${response.status}`);
+                        }
+                    } catch (error) {
+                        console.error(`Network error during row ${index + 1} submission:`, error);
+                        //alert(`Network error submitting row ${index + 1}.`);
+                    }
+                });
 
                 buttonCell.appendChild(submitButton);
                 row.appendChild(buttonCell); // Add button to the row
@@ -244,6 +270,106 @@ async function dataAdminMAJMission(uri) {
     } catch (error) {
         console.error('Error in dataAdminMAJMission:', error);
     }
+}
+
+async function dataAdminMAJMission(uri,toUri) {
+    //console.log('Fetching data from:', SITE + uri);
+    //console.log('to:', SITE+toUri);
+    try {
+        const tableWrapper = await fetchData(SITE + uri, "Mission en attente"); // Fetch the data
+
+        if (!tableWrapper) {
+            //console.error('Error fetching data!');
+            return;
+        }
+
+        const table = tableWrapper.querySelector('table');
+        if (table) {
+            const statusOptions = ['EnCours', 'Abandonne', 'EnAttente'];
+            const rows = Array.from(table.querySelectorAll('tbody tr'));
+
+            rows.forEach((row, index) => {
+                // Extract IDs from the row (modify this based on your data structure)
+                const idChauffeur = row.cells[0]?.innerText.trim(); // Assume ID is in the first cell
+                const idAdmin = row.cells[1]?.innerText.trim();    // Assume Admin ID is in the second cell
+
+                if (!idChauffeur || !idAdmin) {
+                    console.error(`Missing data for row: ${index}`);
+                    return;
+                }
+
+                // Add status dropdown
+                const statusCell = document.createElement('td');
+                const select = document.createElement('select');
+
+                statusOptions.forEach((status) => {
+                    const option = document.createElement('option');
+                    option.value = status;
+                    option.textContent = status;
+                    select.appendChild(option);
+                });
+
+                statusCell.appendChild(select);
+                row.appendChild(statusCell); // Add dropdown to the row
+
+                // Add date input for "date_prevue"
+                const dateCell = document.createElement('td');
+                const dateInput = document.createElement('input');
+                dateInput.type = 'date';
+                dateInput.required = true;
+                dateCell.appendChild(dateInput);
+                row.appendChild(dateCell);
+
+                // Add submit button
+                const buttonCell = document.createElement('td');
+                const submitButton = document.createElement('button');
+                submitButton.textContent = 'Submit';
+                submitButton.style.margin = '0 5px';
+
+                // Add event listener to submit button
+                submitButton.addEventListener('click', async () => {
+                    const payload = {
+                        row: {
+                            //id_chauffeur: idChauffeur,
+                            //id_admin: idAdmin,
+                            status: select.value,
+                            //date_prevue: dateInput.value
+                        }
+                    };
+                    console.log(payload);
+
+                    try {
+                        // Send the data
+                        const response = sendData(toUri, payload);
+
+                        if (response.ok) {
+                            console.log(`Row ${index + 1} data sent successfully:`, payload);
+                            alert(`Row ${index + 1} submission successful!`);
+                        } else {
+                            console.error(`Row ${index + 1} submission failed. Status: ${response.status}`);
+                            alert(`Error submitting row ${index + 1}. Status: ${response.status}`);
+                        }
+                    } catch (error) {
+                        console.error(`Network error during row ${index + 1} submission:`, error);
+                        //alert(`Network error submitting row ${index + 1}.`);
+                    }
+                });
+
+                buttonCell.appendChild(submitButton);
+                row.appendChild(buttonCell); // Add button to the row
+            });
+        }
+
+        // Append the updated tableWrapper to the result
+        result.appendChild(tableWrapper);
+    } catch (error) {
+        console.error('Error in dataAdminMAJMission:', error);
+    }
+}
+
+function deleteRow(table,uri){
+
+
 }
 
 
@@ -270,6 +396,7 @@ function sendDataLine(row, index) {
     console.log(`Row ${index + 1} data:`, data); // Convert the map to an object for readability the chef's kiss ofc (ihda2 lilghali)
     return data;
 }
+
 function dataFormMaj(table,toSendUri) {
    
     result.innerHTML = ''; // Clear previous form elements
@@ -359,6 +486,194 @@ function sendData(uri, data = {}) {
     });
 }
 
+function dataFormMissionMaj(toSendUri) {
+    result.innerHTML = ''; // Clear previous form elements
+
+    // Predefined row structure for mission
+    const rowFields = [
+        { label: "ID Chauffeur", key: "id_chauffeur" },
+        { label: "ID Admin", key: "id_admin" },
+        { label: "Status", key: "status" },
+        { label: "Date Prévue", key: "date_prevue", type: "date" }
+    ];
+
+    const rowData = {}; // Object to store row data
+
+    const formContainer = document.createElement('fieldset');
+    formContainer.style.border = "1px solid #ddd";
+    formContainer.style.padding = "20px";
+    formContainer.style.margin = "20px";
+
+    // Create fields for the row object
+    rowFields.forEach(field => {
+        const div = document.createElement('div');
+        div.style.display = "flex";
+        div.style.alignItems = "center";
+        div.style.marginBottom = "10px";
+
+        const label = document.createElement('label');
+        label.innerHTML = `${field.label} : `;
+        label.style.marginRight = "10px";
+        label.style.width = "150px";
+        label.style.textAlign = "right";
+
+        const input = document.createElement('input');
+        input.type = field.type || "text";
+        input.style.flex = "1";
+        input.style.padding = "5px";
+        input.id = `row-${field.key}`;
+
+        div.appendChild(label);
+        div.appendChild(input);
+        formContainer.appendChild(div);
+
+        // Store references to inputs in rowData
+        rowData[field.key] = input;
+    });
+
+    result.appendChild(formContainer);
+
+    // Submit button
+    const sendButton = submitButton('Send Data');
+    sendButton.addEventListener('click', () => {
+        const rowDataValues = {};
+        for (let key in rowData) {
+            rowDataValues[key] = rowData[key].value.trim();
+        }
+
+        const payload = {
+            row: rowDataValues
+        };
+
+        console.log(payload); // For debugging
+        sendData(toSendUri, payload);
+    });
+
+    result.appendChild(sendButton);
+}
+
+
+
+function dataFormLivraisonMaj(toSendUri) {
+    result.innerHTML = ''; // Clear previous form elements
+
+    // Predefined row structure
+    const rowFields = [
+        { label: "ID Camion", key: "id_camion" },
+        { label: "ID Mission", key: "id_mission" },
+        { label: "ID Dépôt Départ", key: "id_depot_depart" },
+        { label: "ID Dépôt Arrivé", key: "id_depot_arrive" },
+        { label: "Date Livraison", key: "date_livraison", type: "date" },
+    ];
+
+    const rowData = {}; // Object to store row data
+    const products = []; // Array to store product data
+
+    const formContainer = document.createElement('fieldset');
+    formContainer.style.border = "1px solid #ddd";
+    formContainer.style.padding = "20px";
+    formContainer.style.margin = "20px";
+
+    // Create fields for the row object
+    rowFields.forEach(field => {
+        const div = document.createElement('div');
+        div.style.display = "flex";
+        div.style.alignItems = "center";
+        div.style.marginBottom = "10px";
+
+        const label = document.createElement('label');
+        label.innerHTML = `${field.label} : `;
+        label.style.marginRight = "10px";
+        label.style.width = "150px";
+        label.style.textAlign = "right";
+
+        const input = document.createElement('input');
+        input.type = field.type || "text";
+        input.style.flex = "1";
+        input.style.padding = "5px";
+        input.id = `row-${field.key}`;
+
+        div.appendChild(label);
+        div.appendChild(input);
+        formContainer.appendChild(div);
+
+        // Store references to inputs in rowData
+        rowData[field.key] = input;
+    });
+
+    result.appendChild(formContainer);
+
+    // Product form section
+    const productContainer = document.createElement('div');
+    productContainer.id = "product-container";
+    productContainer.style.border = "1px solid #ddd";
+    productContainer.style.padding = "20px";
+    productContainer.style.margin = "20px";
+
+    const productTitle = document.createElement('h4');
+    productTitle.innerText = "Products";
+    productContainer.appendChild(productTitle);
+
+    const addProductButton = document.createElement('button');
+    addProductButton.innerText = "Add Product";
+    addProductButton.style.marginBottom = "10px";
+    addProductButton.addEventListener('click', () => {
+        // Add a new product entry (ID and quantity)
+        const productDiv = document.createElement('div');
+        productDiv.style.display = "flex";
+        productDiv.style.marginBottom = "10px";
+
+        const productIdInput = document.createElement('input');
+        productIdInput.type = "text";
+        productIdInput.placeholder = "Product ID";
+        productIdInput.style.marginRight = "10px";
+
+        const productQuantityInput = document.createElement('input');
+        productQuantityInput.type = "number";
+        productQuantityInput.placeholder = "Quantity";
+
+        const removeProductButton = document.createElement('button');
+        removeProductButton.innerText = "Remove";
+        removeProductButton.style.marginLeft = "10px";
+        removeProductButton.addEventListener('click', () => {
+            productContainer.removeChild(productDiv);
+        });
+
+        productDiv.appendChild(productIdInput);
+        productDiv.appendChild(productQuantityInput);
+        productDiv.appendChild(removeProductButton);
+        productContainer.appendChild(productDiv);
+
+        // Push inputs to products array for tracking
+        products.push({ id: productIdInput, quantity: productQuantityInput });
+    });
+
+    productContainer.appendChild(addProductButton);
+    result.appendChild(productContainer);
+
+    // Submit button
+    const sendButton = submitButton('Send Data');
+    sendButton.addEventListener('click', () => {
+        const rowDataValues = {};
+        for (let key in rowData) {
+            rowDataValues[key] = rowData[key].value.trim();
+        }
+
+        const productValues = products
+            .map(({ id, quantity }) => [parseInt(id.value.trim()), parseInt(quantity.value.trim())])
+            .filter(([id, quantity]) => !isNaN(id) && !isNaN(quantity)); // Filter out incomplete products
+
+        const payload = {
+            row: rowDataValues,
+            products: productValues
+        };
+
+        console.log(payload); // For debugging
+        sendData(toSendUri, payload);
+    });
+
+    result.appendChild(sendButton);
+}
 
 
 
@@ -412,8 +727,8 @@ function dataChauffeurConsult(){
         if (id) {
             input.remove();
             submitB.remove();
-            fetchData(SITE + `select/chauffeurs/${id-1}/${id-1}`, "info du chaffeur").then(tab => result.appendChild(tab)); // Call fetchData with the input ID
-            fetchData(SITE + `select/missions/${id-1}/${id-1}`, "les missons réalisées ou en cours").then(tab => result.appendChild(tab));
+            fetchData(SITE+`select/chauffeurs/id=${id}`, "info du chaffeur").then(tab => result.appendChild(tab)); // Call fetchData with the input ID
+            fetchData(SITE+`select_instances/missions/id_chauffeur/${id}`, "les missons réalisées ou en cours").then(tab => result.appendChild(tab));
         } else {
             alert("Please enter a valid Chauffeur ID");
         }
@@ -427,7 +742,21 @@ function dataChauffeurConsult(){
 
 
 function dataChauffeurMAJ(){
-
+    const input = Authentification(); // Create the input field
+    const submitB = submitButton("Submit");
+    submitB.addEventListener('click', () => {
+        const id = input.value.trim() ; // Get the input value, 
+        if (id) {
+            input.remove();
+            submitB.remove();
+            //fetchData(SITE+`/missions/chauffeurs/EnAttente/${id}`, "info du chaffeur").then(tab => result.appendChild(tab)); // Call fetchData with the input ID
+            dataAdminMAJMission2(`missions/chauffeurs/EnAttente/${id}`); //(`,SITE+'admin/insert/mission');
+            //fetchData(SITE+`select/missions/${id-1}/${id-1}`, "les missons réalisées ou en cours").then(tab => result.appendChild(tab));
+        } else {
+            alert("Please enter a valid Chauffeur ID");
+        }
+    });
+    deleteEvent(consult,dataChauffeurConsult);
 }
 
 

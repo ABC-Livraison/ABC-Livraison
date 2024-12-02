@@ -412,8 +412,8 @@ function dataChauffeurConsult(){
         if (id) {
             input.remove();
             submitB.remove();
-            fetchData(`http://localhost:8080/select/chauffeurs/${id-1}/${id-1}`, "info du chaffeur").then(tab => result.appendChild(tab)); // Call fetchData with the input ID
-            fetchData(`http://localhost:8080/select/missions/${id-1}/${id-1}`, "les missons réalisées ou en cours").then(tab => result.appendChild(tab));
+            fetchData(SITE + `select/chauffeurs/${id-1}/${id-1}`, "info du chaffeur").then(tab => result.appendChild(tab)); // Call fetchData with the input ID
+            fetchData(SITE + `select/missions/${id-1}/${id-1}`, "les missons réalisées ou en cours").then(tab => result.appendChild(tab));
         } else {
             alert("Please enter a valid Chauffeur ID");
         }

@@ -34,18 +34,58 @@ h3 {
     font-size: 18px;
 }
 
-#result, .logs {
-    display: inline;
-    background-color: rgba(255, 255, 255, 0.9);
-    color: black;
+#result {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    align-items: flex-start;
+    width: 90%;
+    max-width: 1400px;
+    margin: 20px auto;
     padding: 20px;
+    background-color: rgba(255, 255, 255, 0.9);
     border-radius: 15px;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-    max-width: 700px;
-    word-wrap: break-word;
-    white-space: pre-wrap;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    overflow: auto;
+}
+
+.table-wrapper {
+    flex: 1 1 calc(33.33% - 20px);
+    max-width: calc(33.33% - 20px);
+    background: white;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: auto;
+    max-height: 500px;
+}
+
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    text-align: left;
+}
+
+.styled-table th, 
+.styled-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
     text-align: center;
-    size: 100%;
+}
+
+.styled-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+.styled-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.styled-table tr:hover {
+    background-color: #f1f1f1;
 }
 
 .logs {
@@ -100,52 +140,8 @@ button:hover {
     margin: 20px 0;
 }
 
-.table-wrapper {
-    width: 90%;
-    max-width: 800px;
-    margin: 0 auto;
-    background: white;
-    border-radius: 8px;
-    padding: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    overflow-x: auto;
-}
-
-.styled-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-    text-align: left;
-}
-
-.styled-table th, 
-.styled-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
-}
-
-.styled-table th {
-    background-color: #f4f4f4;
-    font-weight: bold;
-}
-
-.styled-table tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-.styled-table tr:hover {
-    background-color: #f1f1f1;
-}
-
-#result {
-    position: relative;
-    top: 30%;
-    display: none;
-}
-
 #return-button {
-    position: fixed;
+    position: absolute;
     bottom: 10px;
     right: 10px;
     margin: 0;
@@ -174,5 +170,12 @@ button:hover {
 }
 
 #work {
+    display: none;
+}
+
+
+#result {
+    position: relative;
+    top: 30%;
     display: none;
 }

@@ -1,5 +1,5 @@
 
-const SITE = "https://free-sgbd2024.fly.dev/"; // http://localhost:8080/
+const SITE = "http://localhost:8080/";
 
 const admin = document.getElementById('admin');
 const chauffeur = document.getElementById('chauffeur');
@@ -173,13 +173,13 @@ function dataAdminMAJ(){
         });
 
 
-        camionMaj.addEventListener('click',()=>{fetchData(SITE+'select/camions/0' ).then(tab =>  dataFormMaj(tab,SITE+'insert/camions'));deleteButtons()});
-        chauffeurMaj.addEventListener('click',()=>{fetchData(SITE+'select/chauffeurs/0' ).then(tab =>  dataFormMaj(tab,SITE+'insert/chauffeurs'));deleteButtons()});
-        missionMaj.addEventListener('click',()=>{fetchData(SITE+'select/missions/0').then(tab =>  dataFormMaj(tab,SITE+'insert/missions'));deleteButtons()});
+        camionMaj.addEventListener('click',()=>{fetchData(SITE+'select/camions/0' ).then(tab =>  dataFormMaj(tab,SITE+'admin/insert/camion'));deleteButtons()});
+        chauffeurMaj.addEventListener('click',()=>{fetchData(SITE+'select/chauffeurs/0' ).then(tab =>  dataFormMaj(tab,SITE+'admin/insert/chauffeur'));deleteButtons()});
+        missionMaj.addEventListener('click',()=>{fetchData(SITE+'select/missions/0').then(tab =>  dataFormMaj(tab,SITE+'admin/insert/mission'));deleteButtons()});
 
 
         livraisonMaj.addEventListener('click',()=>{
-            fetchData(SITE+'select/livraisons/0').then(tab =>  dataFormMaj(tab,SITE+'insert/livraisons'));
+            fetchData(SITE+'select/livraisons/0').then(tab =>  dataFormMaj(tab,SITE+'admin/insert/livraisons'));
             deleteButtons()
             //const div = document.createElement('div');
             const b = submitButton('+produit');
@@ -271,9 +271,13 @@ function sendDataLine(row, index) {
     return data;
 }
 function dataFormMaj(table,toSendUri) {
+   
     result.innerHTML = ''; // Clear previous form elements
     let HeadRowElem = table.querySelector('thead tr').getElementsByTagName('th');
-    let titles = Array.from(HeadRowElem).map(th => th.innerText);
+    // Filter titles to exclude 'id' or similar fields
+    let titles = Array.from(HeadRowElem)
+        .map(th => th.innerText)
+        .filter(title => !title.toLowerCase().includes('id')); // Exclude fields containing 'id'
     let dataHolder = [];
 
     const formContainer = document.createElement('fieldset');
@@ -323,8 +327,11 @@ function parseDateFromFormMaj(titles, dataHolder, uri) {
         }
         res[title] = value;
     });
-    console.log(res);
-    sendData(uri, res);
+
+    const payload = { row: res };
+
+    console.log(payload); // Debugging
+    sendData(uri, payload);
 }
 
 function sendData(uri, data = {}) {
@@ -339,13 +346,19 @@ function sendData(uri, data = {}) {
         if (response.ok) {
             console.log('Data sent successfully:', data);
         } else {
-            console.error('Error sending data:', response.status);
+            console.error('Error sending data:', response.status, response.statusText);
+            response.json().then(errorDetails => {
+                console.error('Response details:', errorDetails);
+            }).catch(() => {
+                console.error('Unable to parse error details from response.');
+            });
         }
     })
     .catch(error => {
         console.error('Network error:', error);
     });
 }
+
 
 
 
@@ -399,8 +412,8 @@ function dataChauffeurConsult(){
         if (id) {
             input.remove();
             submitB.remove();
-            fetchData(SITE + `select/chauffeurs/${id-1}/${id-1}`, "info du chaffeur").then(tab => result.appendChild(tab)); // Call fetchData with the input ID
-            fetchData(SITE + `select/missions/${id-1}/${id-1}`, "les missons réalisées ou en cours").then(tab => result.appendChild(tab));
+            fetchData(`http://localhost:8080/select/chauffeurs/${id-1}/${id-1}`, "info du chaffeur").then(tab => result.appendChild(tab)); // Call fetchData with the input ID
+            fetchData(`http://localhost:8080/select/missions/${id-1}/${id-1}`, "les missons réalisées ou en cours").then(tab => result.appendChild(tab));
         } else {
             alert("Please enter a valid Chauffeur ID");
         }

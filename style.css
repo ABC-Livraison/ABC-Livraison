@@ -12,7 +12,6 @@ body {
     background-size: cover;
     background-repeat: no-repeat;
 }
-
 h1#BigTitle {
     font-family: 'Roboto Mono', monospace;
     background: linear-gradient(135deg, #2a9d8f, #e9c46a);
@@ -20,9 +19,21 @@ h1#BigTitle {
     -webkit-text-fill-color: transparent;
     text-transform: uppercase;
     letter-spacing: 3px;
-    font-size: 2.5rem;
-    margin-bottom: 20px;
+    font-size: 4rem; /* Increased font size */
+    margin: 0;
+    position: absolute; /* Allows precise centering */
+    top: 50%; /* Center vertically */
+    left: 50%; /* Center horizontally */
+    transform: translate(-50%, -50%); /* Adjust for element's size */
+    text-align: center; /* Center align text */
+    transition: font-size 0.5s ease, transform 0.5s ease; /* Smooth transition */
 }
+
+h1#BigTitle:hover {
+    font-size: 5rem; /* Increase size on hover */
+    transform: translate(-50%, -50%) scale(1.1); /* Slight zoom effect */
+}
+
 
 h1#tableTitle {
     margin-bottom: 20px;
@@ -178,4 +189,59 @@ button:hover {
     position: relative;
     top: 30%;
     display: none;
+}
+
+
+#result {
+    display: none;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    align-items: flex-start;
+    width: 90%; /* Keep some padding from the edges */
+    max-width: 1400px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    overflow: auto;
+}
+
+.table-wrapper {
+    flex: 1 1 calc(50% - 20px); /* Make the table take 50% of the width */
+    max-width: calc(50% - 20px); /* Prevent overflow */
+    background: white;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: auto;
+    max-height: 500px; /* Ensure vertical scrolling if needed */
+}
+
+.styled-table {
+    width: 100%; /* Use full width of the container */
+    border-collapse: collapse;
+    font-size: 14px;
+    text-align: left;
+}
+
+.styled-table th, 
+.styled-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+.styled-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+.styled-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.styled-table tr:hover {
+    background-color: #f1f1f1;
 }

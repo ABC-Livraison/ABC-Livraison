@@ -1,6 +1,5 @@
 
-const server_domain = "https://free-sgbd2024.fly.dev/";
-const SITE = server_domain;
+const SITE = "https://free-sgbd2024.fly.dev";
 
 const admin = document.getElementById('admin');
 const chauffeur = document.getElementById('chauffeur');
@@ -139,6 +138,8 @@ function dataAdminMAJ(){
         const chauffeurMaj = submitButton("Ajout de Chauffeur");
         const missionMaj = submitButton("Ajout de mission");
 
+        const missionDel = submitButton("Suppression de mission");
+
         auth.style.display = 'none';
         submitB.style.display = 'none';
 
@@ -148,6 +149,7 @@ function dataAdminMAJ(){
             camionMaj.remove();
             chauffeurMaj.remove();
             missionMaj.remove();
+            missionDel.remove();
         }
     
 
@@ -171,6 +173,8 @@ function dataAdminMAJ(){
         chauffeurMaj.addEventListener('click',()=>{fetchData(SITE+'select/chauffeurs/0' ).then(tab =>  dataFormMaj(tab,SITE+'admin/insert/chauffeur'));deleteButtons()});
         livraisonMaj.addEventListener('click',()=>dataFormLivraisonMaj(SITE+'admin/insert/livraison'));
         missionMaj.addEventListener('click',()=>dataFormMissionMaj(SITE+'admin/insert/mission'));
+
+        missionDel.addEventListener('click',()=>{ fetchData(SITE+'select/missions/0', "supprime la mission").then(tab=> deleteRow(tab, SITE+'/remove/:table/id='));deleteButtons()});
 
 
     });
@@ -368,10 +372,71 @@ async function dataAdminMAJMission(uri,toUri) {
     }
 }
 
-function deleteRow(table,uri){
+function deleteRow(table, uri) {//put the uri without the id 
+    // Get all rows of the table body
+    const rows = table.querySelectorAll('tbody tr');
 
+    rows.forEach((row, index) => {
+        // Extract the ID from the row (assume the ID is in the first cell)
+        const id = row.cells[0]?.innerText.trim();
+        if (!id) {
+            console.error(`Missing ID for row ${index + 1}`);
+            return;
+        }
 
+        // Add a delete button if not already present
+        if (!row.querySelector('.delete-button')) {
+            const buttonCell = document.createElement('td');
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.classList.add('delete-button');
+            deleteButton.style.background = '#e63946';
+            deleteButton.style.color = '#fff';
+            deleteButton.style.border = 'none';
+            deleteButton.style.padding = '5px 10px';
+            deleteButton.style.borderRadius = '4px';
+            deleteButton.style.cursor = 'pointer';
+            deleteButton.style.transition = 'background 0.3s';
+
+            // Add hover effect
+            deleteButton.addEventListener('mouseover', () => {
+                deleteButton.style.background = '#d62828';
+            });
+            deleteButton.addEventListener('mouseout', () => {
+                deleteButton.style.background = '#e63946';
+            });
+
+            // Add click event listener
+            deleteButton.addEventListener('click', async () => {
+                try {
+                    // Make a DELETE request
+                    const response = await fetch(uri+`${id}`, {
+                        method: 'DELETE',
+                    });
+
+                    if (response.ok) {
+                        alert(`Row with ID ${id} deleted successfully.`);
+                        // Refresh the table by removing the row
+                        row.remove();
+                        // Re-call this function to refresh the table
+                        deleteRow(table, uri);
+                    } else {
+                        console.error(`Failed to delete row ${index + 1}. Status: ${response.status}`);
+                        alert(`Error deleting row ${index + 1}. Status: ${response.status}`);
+                    }
+                } catch (error) {
+                    console.error(`Network error during deletion of row ${index + 1}:`, error);
+                    alert(`Network error during deletion of row ${index + 1}.`);
+                }
+            });
+
+            buttonCell.appendChild(deleteButton);
+            row.appendChild(buttonCell); // Add button to the row
+        }
+    });
+    result.appendChild(table);
 }
+
 
 
 function sendDataLine(row, index) {
@@ -812,9 +877,12 @@ chauffeurs.addEventListener('click',()=>deleteLogs(admin,chauffeurs));
 
 admin.addEventListener("click",()=>{work.style.display = 'flex';
                                     fetchDataAdmin();
+                                    document.getElementById('BigTitle').style.display = 'none';  
+
                                     });
 chauffeur.addEventListener("click",()=>{work.style.display = 'flex';
-                                        fetchDataChauffeur();    
+                                        fetchDataChauffeur();  
+                                        document.getElementById('BigTitle').style.display = 'none';  
                                         });
 
 

@@ -1,5 +1,5 @@
 
-const SITE = "https://free-sgbd2024.fly.dev";
+const SITE = "https://free-sgbd2024.fly.dev/";
 
 const admin = document.getElementById('admin');
 const chauffeur = document.getElementById('chauffeur');

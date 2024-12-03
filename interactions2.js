@@ -1,5 +1,6 @@
 
-const SITE = "http://localhost:8080/";
+const server_domain = "https://free-sgbd2024.fly.dev/";
+const SITE = server_domain;
 
 const admin = document.getElementById('admin');
 const chauffeur = document.getElementById('chauffeur');

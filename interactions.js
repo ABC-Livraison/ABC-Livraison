@@ -1,5 +1,5 @@
 
-const SITE = "https://free-sgbd2024.fly.dev/";
+const SITE = "http://localhost:8080/";
 
 const admin = document.getElementById('admin');
 const chauffeur = document.getElementById('chauffeur');
@@ -751,13 +751,13 @@ function redirectToLogin() {
 admin.addEventListener("click",()=>{
     work.style.display = 'flex';
     fetchDataAdmin();
-    document.getElementById('BigTitle').style.display = 'none';  
+    //document.getElementById('BigTitle').style.display = 'none';  
 });
 
 chauffeur.addEventListener("click",()=>{
     work.style.display = 'flex';
     fetchDataChauffeur();  
-    document.getElementById('BigTitle').style.display = 'none';  
+    //document.getElementById('BigTitle').style.display = 'none';  
 });
 
 
